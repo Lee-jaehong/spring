@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.idev.boot.dao.ChatMapper">
+<!--  chat insert 하기  -->
+	<insert id="Chatinsert" parameterType="ChatMessage"> 
+		INSERT INTO chat(chatId,fromId,toId,content) values(chat_seq.nextval, #{fromId}, #{toId}, #{content}) 
+	</insert>
+	
+	<!--  아이디에 따라 채팅 내역 가져오기  -->
+	<select id="CharListById" parameterType="java.util.Map" resultType="ChatMessage">
+		SELECT * FROM chat WHERE ((fromId = #{fromId} AND toId=#{toId}) OR (fromId=#{toId} AND toId=#{fromId}))
+		AND chatId > #{chatId} ORDER BY chatTime 
+	</select>
+	
+	<!--  최근 메시지 목록들 다시 가져오기  -->
+	<select id="CharListRecentById" parameterType="java.util.Map" resultType="ChatMessage">
+		SELECT chatId,fromId,toId,content, TO_CHAR(CHATTIME , 'YYYY-MM-DD am HH24:MI:SS') AS chatTime
+		FROM chat WHERE ((fromId = #{fromId} AND toId=#{toId}) OR (fromId=#{toId} AND toId=#{fromId})) 
+		ORDER BY chatTime
+	</select>
+	
+	<!-- 상대 프로필사진 가져오기 -->
+	<select id="ChatOnePicture" parameterType="java.util.Map" resultType="String">
+		SELECT DISTINCT sm.PROFILE_FILE 
+		FROM SNS_MEMBER sm, CHAT c 
+		WHERE c.TOID = #{fromId} AND sm.ID =#{toId}
+	</select>
+	
+	<!-- 채팅창에서 보여줄 프사들 -->
+	<select id="ChatPicture" resultType="ChatProfile">
+		SELECT DISTINCT sm.ID ,sm.PROFILE_FILE 
+		FROM SNS_MEMBER sm , CHAT c 	
+		WHERE sm.ID = c.FROMID OR sm.id = c.TOID
+	</select>
+
+	<!-- 메시지함 -->
+	<select id="getBox" parameterType="java.util.Map" resultType="ChatMessage">
+		SELECT chatId, fromId, toId ,content, TO_CHAR(chatTime , 'AM HH:MI') AS chatTime
+		FROM chat WHERE chatId IN (SELECT max(chatId) FROM chat
+		WHERE toId=#{toId} OR fromId=#{fromId} GROUP BY fromId, toId)	
+	</select>
+	
+	<!-- 메시지 search -->
+	<select id="searchBox" parameterType="java.util.Map" resultType="ChatMessage">
+	SELECT chatId,fromId,toId,content,TO_CHAR(chatTime , 'AM HH:MI') AS chatTime FROM chat WHERE chatId IN 
+		(SELECT max(chatId) FROM chat 
+		WHERE (fromId =#{fromId} OR toId=#{fromId}) AND (fromId =#{toId} OR toId=#{toId}) GROUP BY FROMID,toId)
+	
+	
+	</select>
+	
+	<!-- 헤당 방번호 chat 초기화 시켜주기  -->
+	<delete id="deleteChat" parameterType="java.util.Map">
+	 	DELETE FROM chat where ((fromId = #{fromId} AND toId=#{toId}) OR 
+	 	(fromId=#{fromId} AND toId=#{toId}); 
+	 </delete>
+</mapper>

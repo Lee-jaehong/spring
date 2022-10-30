@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.idev.boot.dao.MemberMapper"> 
+<!-- SNS!!!!! -->	
+	<!-- 회원가입 -->
+	<insert id="register" parameterType="Member">
+		INSERT INTO SNS_MEMBER (ID, PW, AGE, NAME, NICKNAME, BIRTH, ADDR, GENDER, profile_file, CASH, authority)
+		VALUES (#{id}, #{pw}, #{age}, #{name}, #{nickname}, #{birth}, #{addr}, #{gender}, #{profile_file}, #{cash}, 1)
+	</insert>
+
+	<!-- id(이메일) 중복 검사 -->
+	<select id="idCheck" resultType="int" parameterType="String">
+		SELECT COUNT(*) FROM SNS_MEMBER WHERE ID = #{id}
+	</select>
+	
+	<!-- 닉네임 중복 검사 -->
+	<select id="nickCheck" resultType="int" parameterType="String">
+		SELECT COUNT(*) FROM SNS_MEMBER WHERE NICKNAME = #{nickname}
+	</select>
+
+<!-- 1004 작성 -->	
+	<!-- 회원정보 수정 -->
+	<update id="memUpdate" parameterType="Member">
+		UPDATE SNS_MEMBER SET NAME = #{name}, NICKNAME = #{nickname}, 
+		AGE = #{age}, ADDR = #{addr}, PROFILE_FILE = #{profile_file} WHERE ID = #{id}
+	</update>	
+	
+	<!-- 비밀번호 변경 -->
+	<update id="pwChange" parameterType="java.util.HashMap">
+		UPDATE SNS_MEMBER SET PW = #{newpw} WHERE (PW = #{pw} AND ID = #{id}) 
+	</update>
+	
+	<!-- 회원 탈퇴 -->
+	<delete id="memDelete" parameterType="java.util.HashMap">
+		DELETE FROM SNS_MEMBER WHERE (ID = #{id} AND PW = #{pw})
+	</delete>
+</mapper>

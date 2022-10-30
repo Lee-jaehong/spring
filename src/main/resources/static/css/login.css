@@ -1,0 +1,15 @@
+#login_div {
+	width:700px;
+	height: 400px;
+	border: 4px double gray;
+	margin: 100px auto;
+}
+
+.box {
+	padding: 10px 12px;
+}
+
+.but {
+	margin: 10px;
+	padding: 5px 7px;
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.idev.boot.dao.FreeboardMapper">  
+   <!-- 검색 필요없을 때 -->
+	<select id="getPageList" 
+		resultType="TimelineBoard">
+	SELECT * FROM timeline_board order by timeline_board_id desc
+	</select>
+	
+	<select id="getCount" resultType="int">
+	SELECT count(*) FROM timeline_board
+	</select>
+	
+	<select id="detail" resultType="TimelineBoard" parameterType="int">
+	SELECT * FROM timeline_board WHERE timeline_board_id = #{timeline_board_id}
+	</select>
+	
+	<insert id="insert" parameterType="TimelineBoard">
+	insert into timeline_board(timeline_board_id,id,content,filename, nickname) 
+	values (timeline_board_seq.nextval, #{id},#{content},#{filename}, #{nickname})
+	</insert>
+	
+	<update id="readcountUp" parameterType="int">
+	UPDATE timeline_board 
+	SET view_count = view_count +1 
+	WHERE timeline_board_id = #{timeline_board_id}
+	</update>
+	<delete id="delete" parameterType="int">
+	DELETE FROM TIMELINE_BOARD
+	WHERE TIMELINE_BOARD_ID=${timeline_board_id}
+	</delete>
+		<!-- 좋아요 눌럿는지 안눌럿는지 -->
+	<select id="findLike" resultType="int" parameterType="java.util.Map">
+		select count(*) from board_like where board_no = #{board_no} and id = #{id}
+	</select>
+	<select id="getLike" resultType="int" parameterType="int">
+		SELECT heart_count FROM TIMELINE_BOARD WHERE TIMELINE_BOARD_ID = #{timeline_board_id}
+	</select>
+	<insert id="likeUp" parameterType="LikeDto">
+		insert into board_like
+		values(like_seq.nextval, #{board_no}, #{id})
+	</insert>
+	  <delete id="likeDown" parameterType="LikeDto">
+	  	delete from board_like where board_no = #{board_no} and id = #{id} 
+	  </delete>
+	  <update id="likeUp2">
+	  	UPDATE TIMELINE_BOARD SET HEART_COUNT = HEART_COUNT +1 WHERE TIMELINE_BOARD_ID = #{timeline_board_id}
+	  </update>
+	  <update id="likeDown2">
+	  	UPDATE TIMELINE_BOARD SET HEART_COUNT = HEART_COUNT -1 WHERE TIMELINE_BOARD_ID = #{timeline_board_id}
+	  </update>
+	  <update id="update" parameterType="TimelineBoard">
+	  	UPDATE TIMELINE_BOARD x SET x.CONTENT=#{content}, wdate=sysdate WHERE x.TIMELINE_BOARD_ID = #{timeline_board_id}
+	  </update>
+	  <select id="getNick" parameterType="int" resultType="String">
+	  	SELECT sm.NICKNAME FROM TIMELINE_BOARD tb JOIN SNS_MEMBER sm ON tb.ID = sm.ID AND tb.TIMELINE_BOARD_ID = #{timeline_board_id}
+	  </select>
+</mapper>  

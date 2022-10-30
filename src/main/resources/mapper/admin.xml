@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.idev.boot.dao.AdminMapper">
+	<select id="selectMember" resultType="Member">
+		SELECT ID, NICKNAME, NAME FROM SNS_MEMBER WHERE AUTHORITY != 2
+	</select>
+ 
+ 	<update id="lockMember" parameterType="String">
+ 		UPDATE SNS_MEMBER SET AUTHORITY = 3 WHERE ID = #{id}
+ 	</update>
+ 	
+ 	<update id="sMember" parameterType="String">
+ 		UPDATE SNS_MEMBER SET AUTHORITY = 1 WHERE ID = #{id}
+ 	</update>
+ 	
+</mapper>

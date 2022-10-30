@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.idev.boot.dao.ReportMapper">
+	<insert id="insert" parameterType="Report">
+	INSERT INTO ADMIN_BOARD (admin_board_id,id,filename,title,content,WDATE)
+	VALUES (ADMIN_BOARD_SEQ.NEXTVAL,#{id},#{filename},#{title},#{content},sysdate)
+	</insert>
+	
+	<select id="selectReport" resultType="Report" parameterType="String">
+		SELECT * FROM ADMIN_BOARD where id = #{id} order by wdate desc
+	</select>
+	<select id="allReport" resultType="Report">
+		select * from admin_board order by wdate desc
+	</select>
+	
+	<select id="getOne" resultType="Report" parameterType="int">
+		SELECT * FROM ADMIN_BOARD where admin_board_id = #{admin_board_id}
+	</select>
+	
+	<delete id="rDelete" parameterType="int">
+		DELETE FROM ADMIN_BOARD AB WHERE ADMIN_BOARD_ID = #{admin_board_id}
+	</delete>
+	
+		<select id="getPageList" 
+		parameterType="java.util.Map"
+		resultType="Report">
+	SELECT * FROM 
+		(SELECT rownum r ,f.* from
+			(SELECT * FROM ADMIN_BOARD  
+			ORDER BY ADMIN_BOARD_ID DESC) f)
+	WHERE r BETWEEN #{startNo} AND #{endNo}
+	</select>
+	
+	<select id="searchList" parameterType="PageDto" resultType="Report">
+		SELECT * FROM 
+		(SELECT rownum r ,f.* from
+			(SELECT * FROM ADMIN_BOARD  
+				  <if test='"C".equals(field)'>  <!-- 파라미터 PageDto의 field 속성 -->
+				   where content like '%'|| #{findText} ||'%'
+				  </if>
+				  <if test='"N".equals(field)'>  
+				   where id like '%'|| #{findText} ||'%' <!-- 파라미터 PageDto의 findText 속성 -->
+				  </if>
+				  <if test='"S".equals(field)'>
+				   where title like '%'|| #{findText} ||'%'
+				  </if>
+				  <if test='"CS".equals(field)'>
+				   where content like '%'|| #{findText} ||'%'
+				   OR title like '%'|| #{findText} ||'%'
+				  </if>    
+			ORDER BY wdate DESC) f)
+		WHERE r BETWEEN #{startNo} AND #{endNo}
+	</select>
+	
+		<select id="searchCount" parameterType="PageDto" resultType="int">
+		SELECT count(*) FROM ADMIN_BOARD
+				  <if test='"C".equals(field)'>  <!-- 파라미터 PageDto의 field 속성 -->
+				   where content like '%'|| #{findText} ||'%'
+				  </if>
+				  <if test='"N".equals(field)'>  
+				   where id like '%'|| #{findText} ||'%' <!-- 파라미터 PageDto의 findText 속성 -->
+				  </if>
+				  <if test='"S".equals(field)'>
+				   where title like '%'|| #{findText} || '%'
+				  </if>
+				  <if test='"CS".equals(field)'>
+				   where content like '%'|| #{findText} ||'%'
+				   OR title like '%'|| #{findText} ||'%'
+				  </if>        
+	</select>
+</mapper> 
